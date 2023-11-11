@@ -83,7 +83,7 @@ template = '''<?xml version="1.0" encoding="UTF-8"?>
      <rect>
       <x>710</x>
       <y>90</y>
-      <width>41</width>
+      <width>101</width>
       <height>41</height>
      </rect>
     </property>
@@ -91,7 +91,7 @@ template = '''<?xml version="1.0" encoding="UTF-8"?>
      <string notr="true">background-color: rgb(182, 225, 231);</string>
     </property>
     <property name="text">
-     <string>✓</string>
+     <string>Открыть файл</string>
     </property>
    </widget>
    <widget class="QWidget" name="verticalLayoutWidget">
@@ -118,6 +118,9 @@ template = '''<?xml version="1.0" encoding="UTF-8"?>
        </property>
        <property name="tabletTracking">
         <bool>false</bool>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border-bottom-color: rgb(182, 225, 231);</string>
        </property>
        <property name="minimum">
         <number>6</number>
@@ -260,7 +263,7 @@ template = '''<?xml version="1.0" encoding="UTF-8"?>
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:7.8pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:22px; margin-bottom:26px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:26px; &quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:22px; margin-bottom:26px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; line-height:26px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
   </widget>
@@ -772,11 +775,20 @@ class TextEditor(QMainWindow):
         global file
         global file_txt
         try:
-            file = open(self.lineEdit_2.text(), mode="r+", encoding="utf8")
-            print(type(file))
+            file = open(
+                QFileDialog.getOpenFileName(
+                    self, 
+                    'Выбрать текстовый файл', 
+                    '',
+                    'Текстовый файл (*.txt)'
+                )[0],
+                mode="r+", 
+                encoding="utf8"
+            )
+            self.lineEdit_2.setText(file.name)
             file_txt = file.read()
             self.textEdit.setText(file_txt)
-            self.lineEdit_2.setText('')
+            #self.lineEdit_2.setText('')
             self.label.setText('')
         except FileNotFoundError:
             self.lineEdit_2.setText('')
@@ -816,8 +828,10 @@ class TextEditor(QMainWindow):
             file.truncate(0)
             file.seek(0)
             file.write(self.textEdit.toPlainText())
-        except:
-            self.label.setText('Введите путь к файлу')
+        except Exception as e:
+            #self.label.setText('Введите путь к файлу')
+            self.label.setText(f'Error: {e}')
+        text = self.textEdit.toPlainText()
     
     def font_style(self):
         font.show()
